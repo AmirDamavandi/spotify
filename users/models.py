@@ -38,12 +38,6 @@ class User(AbstractBaseUser):
         self.deleted_at = timezone.now()
         self.save()
 
-    def restore(self):
-        self.is_active = True
-        self.is_deleted = False
-        self.deleted_at = None
-        self.save()
-
     def has_perm(self, perm, obj=None):
         return True
 

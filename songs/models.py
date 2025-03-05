@@ -108,3 +108,29 @@ class Song(models.Model):
         self.is_deleted = True
         self.save()
 
+
+class LikedPlaylist(models.Model):
+    user = models.OneToOneField('users.User', on_delete=CASCADE, related_name='like_playlist')
+    name = models.CharField(max_length=15, default='Liked Songs', editable=False)
+    songs = models.ManyToManyField('Song', related_name='likes', through='UserLikedSongs')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.user.nickname} {self.name}'
+
+    class Meta:
+        verbose_name = _('Liked song')
+        verbose_name_plural = _('Liked songs')
+
+class UserLikedSongs(models.Model):
+    like_playlist = models.ForeignKey(LikedPlaylist, on_delete=CASCADE, related_name='liked_songs')
+    song = models.ForeignKey(Song, on_delete=CASCADE)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.song.name
+
+    class Meta:
+        verbose_name = _('User Liked song')
+        verbose_name_plural = _('User Liked songs')
+        unique_together = (('like_playlist', 'song'),)

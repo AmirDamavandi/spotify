@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Playlist, Album, Song, PlaylistSongs, PlaylistCollaborators
+from .models import Playlist, Album, Song, PlaylistSongs, PlaylistCollaborators, LikedPlaylist, UserLikedSongs
 
 
 # Register your models here.
@@ -33,4 +33,17 @@ class PlaylistSongsAdmin(admin.ModelAdmin):
 class PlaylistCollaboratorsAdmin(admin.ModelAdmin):
     list_display = [
         'collaborator', 'playlist', 'added_at'
+    ]
+
+
+@admin.register(LikedPlaylist)
+class LikedSongsAdmin(admin.ModelAdmin):
+    list_display = [
+        'user', 'name', 'created_at'
+    ]
+
+@admin.register(UserLikedSongs)
+class UserLikedSongsAdmin(admin.ModelAdmin):
+    list_display = [
+        'like_playlist', 'song', 'added_at'
     ]

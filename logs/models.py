@@ -1,7 +1,5 @@
 from django.db import models
 from django.db.models import CASCADE
-from songs.models import Song, Playlist, Album
-from users.models import User
 from django.utils.translation import gettext_lazy as _
 
 
@@ -9,8 +7,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class StreamLog(models.Model):
-    user = models.ForeignKey(User, on_delete=CASCADE, related_name='streams')
-    song = models.ForeignKey(Song, on_delete=CASCADE, related_name='streams')
+    user = models.ForeignKey('users.User', on_delete=CASCADE, related_name='streams')
+    song = models.ForeignKey('songs.Song', on_delete=CASCADE, related_name='streams')
     metadata = models.JSONField(default=dict, blank=True, null=True)
     streamed_at = models.DateTimeField(auto_now_add=True)
 
@@ -22,7 +20,7 @@ class StreamLog(models.Model):
         verbose_name_plural = _('Stream Logs')
 
 class UserLog(models.Model):
-    user = models.ForeignKey(User, on_delete=CASCADE, related_name='logs')
+    user = models.ForeignKey('users.User', on_delete=CASCADE, related_name='logs')
     logs = (
         ('Updated nickname', _('updated nickname')), ('Updated email', _('updated email')),
         ('Updated gender', _('updated gender')), ('Updated birthdate', _('updated birthdate')),
@@ -41,7 +39,7 @@ class UserLog(models.Model):
 
 
 class PlaylistLog(models.Model):
-    playlist = models.ForeignKey(Playlist, on_delete=CASCADE, related_name='logs')
+    playlist = models.ForeignKey('songs.Playlist', on_delete=CASCADE, related_name='logs')
     logs = (
         ('Updated cover', _('updated cover')), ('Updated name', _('updated name')),
         ('Updated description', _('updated description')),
@@ -59,7 +57,7 @@ class PlaylistLog(models.Model):
 
 
 class AlbumLog(models.Model):
-    album = models.ForeignKey(Album, on_delete=CASCADE, related_name='logs')
+    album = models.ForeignKey('songs.Album', on_delete=CASCADE, related_name='logs')
     logs = (
         ('Updated cover', _('updated cover')), ('Updated name', _('updated name')),
         ('Updated description', _('updated description')),

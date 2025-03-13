@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from artists.models import Artist
 from users.models import User
+from .services import artist_monthly_listener, artist_popular_songs, artist_albums
+
 
 class ArtistUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,3 +18,19 @@ class ArtistMiniSerializer(serializers.ModelSerializer):
     class Meta:
         model = Artist
         exclude = ['id']
+
+class ArtistSerializer(serializers.ModelSerializer):
+    user = ArtistUserSerializer(read_only=True)
+
+    class Meta:
+        model = Artist
+        exclude = [
+            'id'
+        ]
+    def to_representation(self, instance):
+        from songs.serializers import SongSerializer, AlbumMiniSerializer
+        representation = super().to_representation(instance)
+        representation['monthly_listener'] = artist_monthly_listener(instance)
+        representation['popular_songs'] = SongSerializer(artist_popular_songs(instance, 5), many=True).data
+        representation['albums'] = AlbumMiniSerializer(artist_albums(instance), many=True).data
+        return representation

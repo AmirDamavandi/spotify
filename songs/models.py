@@ -2,7 +2,6 @@ import uuid
 from django.utils import timezone
 from django.db import models
 from django.db.models import CASCADE
-from artists.models import Artist
 from django.core.validators import FileExtensionValidator
 from django.utils.translation import gettext_lazy as _
 

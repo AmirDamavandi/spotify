@@ -1,3 +1,4 @@
+from artists.models import Artist
 from .models import Album, Song
 from django.db.models import Count, Q
 from django.utils import timezone
@@ -11,3 +12,6 @@ def popular_albums(limit: int or None):
         )
     ).order_by('-stream_count')[:limit]
     return queryset
+
+def song_stream_count(song: Song):
+    return song.streams.count()

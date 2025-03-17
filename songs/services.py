@@ -1,8 +1,9 @@
-from artists.models import Artist
 from .models import Album, Song
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
 from django.utils import timezone
 from datetime import timedelta
+from time import strftime, gmtime
+
 
 def popular_albums(limit: int or None):
     a_month_ago = timezone.now() - timedelta(days=30)
@@ -15,3 +16,14 @@ def popular_albums(limit: int or None):
 
 def song_stream_count(song: Song):
     return song.streams.count()
+
+
+def album_song_count(album: Album):
+    return album.songs.count()
+
+def album_duration(album: Album):
+    duration = album.songs.aggregate(
+        album_duration=Sum('duration')
+    )
+    duration = duration['album_duration'].seconds
+    return strftime('%H:%M:%S', gmtime(duration))

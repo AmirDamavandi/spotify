@@ -1,4 +1,3 @@
-from django.db.transaction import non_atomic_requests
 from django.http import Http404
 from rest_framework import status
 from rest_framework.views import APIView, Response
@@ -16,18 +15,16 @@ class UserProfileAPIView(APIView):
             self.user = user
         except User.DoesNotExist:
             raise Http404('User does not exist')
-        return super(UserProfileAPIView, self).setup(request, *args, **kwargs)
+        return super().setup(request, *args, **kwargs)
 
-    def dispatch(self, request, *args, **kwargs):
-        if request.user == self.user:
-            self.serializer_class = AuthenticatedUserProfileSerializer
-        else:
-            self.serializer_class = UserProfileSerializer
-        return super(UserProfileAPIView, self).dispatch(request, *args, **kwargs)
+    def get_serializer_class(self):
+        if self.request.user == self.user:
+            return AuthenticatedUserProfileSerializer
+        return UserProfileSerializer
 
 
     def get(self, request, *args, **kwargs):
         user = self.user
-        serializer = self.serializer_class(user)
-        data = serializer.data
+        serializer = self.get_serializer_class()
+        data = serializer(user).data
         return Response(data, status=status.HTTP_200_OK)

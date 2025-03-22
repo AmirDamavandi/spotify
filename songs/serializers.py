@@ -1,7 +1,6 @@
 from rest_framework import serializers
-
 from artists.serializers import ArtistMiniSerializer
-from .models import Album, Song
+from .models import Album, Song, Playlist
 from .services import song_stream_count, album_song_count, album_duration
 
 
@@ -37,7 +36,13 @@ class AlbumSerializer(serializers.ModelSerializer):
             'description', 'is_deleted'
         ]
     def to_representation(self, instance):
-        representation = super().to_representation(instance)
+        representation = super(AlbumSerializer, self).to_representation(instance)
         representation['song_count'] = album_song_count(instance)
         representation['album_duration'] = album_duration(instance)
         return representation
+
+
+class PlaylistMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Playlist
+        fields = ['id', 'name', 'cover']

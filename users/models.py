@@ -56,8 +56,8 @@ class User(AbstractBaseUser):
 
 
 class Relation(models.Model):
-    from_user = models.ForeignKey(User, on_delete=CASCADE, related_name='followers')
-    to_user = models.ForeignKey(User, on_delete=CASCADE, related_name='following')
+    from_user = models.ForeignKey(User, on_delete=CASCADE, related_name='following')
+    to_user = models.ForeignKey(User, on_delete=CASCADE, related_name='followers')
     followed_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

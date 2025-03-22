@@ -20,11 +20,16 @@ from django.conf import settings
 from django.conf.urls.static import static
 from artists import urls as artists_urls
 from songs import urls as songs_urls
+from users import urls as users_urls
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('api/', include(artists_urls)),
     path('api/', include(songs_urls)),
+    path('api/', include(users_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) +\
     static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

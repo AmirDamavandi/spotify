@@ -38,3 +38,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
         representation['user_followers'] = UserMiniSerializer(user_followers(instance), many=True).data
         representation['user_following'] = UserMiniSerializer(user_following(instance), many=True).data
         return representation
+
+
+class UserSignUpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['nickname', 'email', 'gender', 'date_of_birth', 'avatar', 'password']
+
+
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        return user

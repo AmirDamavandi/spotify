@@ -1,8 +1,9 @@
 from .models import Album, Song
 from django.db.models import Count, Q, Sum
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime
 from time import strftime, gmtime
+from songs.models import PlaylistSongs, Playlist
 
 
 def popular_albums(limit: int or None):
@@ -26,4 +27,15 @@ def album_duration(album: Album):
         album_duration=Sum('duration')
     )
     duration = duration['album_duration'].seconds
+    return strftime('%H:%M:%S', gmtime(duration))
+
+def playlist_song_count(playlist: Playlist):
+    count = playlist.songs.count()
+    return count
+
+def playlist_duration(playlist: Playlist):
+    duration = playlist.songs.aggregate(
+        playlist_duration=Sum('duration')
+    )
+    duration = duration['playlist_duration'].seconds
     return strftime('%H:%M:%S', gmtime(duration))

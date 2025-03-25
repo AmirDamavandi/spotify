@@ -49,7 +49,7 @@ class PlaylistCollaborators(models.Model):
 
 class PlaylistSongs(models.Model):
     playlist = models.ForeignKey('Playlist', on_delete=CASCADE, related_name='playlist_songs')
-    song = models.ForeignKey('Song', on_delete=CASCADE)
+    song = models.ForeignKey('Song', on_delete=CASCADE, related_name='playlist_songs')
     added_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

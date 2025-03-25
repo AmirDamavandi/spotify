@@ -27,6 +27,10 @@ class AuthenticatedUserProfileSerializer(serializers.ModelSerializer):
         representation['user_following'] = UserMiniSerializer(user_following(instance), many=True).data
         return representation
 
+    def create(self, validated_data):
+        user = User.objects.update(**validated_data)
+        return user
+
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -49,3 +53,11 @@ class UserSignUpSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
+
+
+class EditUserProfileSerializer(serializers.ModelSerializer):
+    nickname = serializers.CharField(required=False)
+    avatar = serializers.ImageField(required=False)
+    class Meta:
+        model = User
+        fields = ['avatar', 'nickname']

@@ -3,9 +3,9 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView, Response
 from .serializers import (AuthenticatedUserProfileSerializer, UserProfileSerializer, UserSignUpSerializer,
-                          EditUserProfileSerializer, UserAccountUpdateSerializer
+                          EditUserProfileSerializer, UserAccountUpdateSerializer, RelationSerializer
                           )
-from .models import User
+from .models import User, Relation
 from .permissions import IsNotAuthenticated, IsOwner
 
 
@@ -95,3 +95,28 @@ class UserAccountUpdateAPIView(APIView):
             success_message = {'message': 'Profile Saved'}
             return Response(success_message, status=status.HTTP_200_OK)
         return Response(user_data.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RelationAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, from_user, to_user):
+        relation = get_object_or_404(Relation, from_user=from_user, to_user=to_user)
+        return relation
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        serializer_data = RelationSerializer(data=data)
+        if serializer_data.is_valid():
+            serializer_data.save()
+            success_message = {'message': 'Followed'}
+            return Response(success_message, status=status.HTTP_201_CREATED)
+        return Response(serializer_data.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, *args, **kwargs):
+        data = request.data
+        instance = self.get_object(from_user=data['from_user'], to_user=data['to_user'])
+        if instance:
+            instance.delete()
+            success_message = {'message': 'Unfollowed'}
+            return Response(success_message, status=status.HTTP_204_NO_CONTENT)

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, Relation
 from songs.serializers import PlaylistMiniSerializer
 from .services import user_top_artists, user_top_tracks, user_public_playlists, user_followers, user_following
 
@@ -75,3 +75,13 @@ class UserAccountUpdateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.update(**validated_data)
         return user
+
+
+class RelationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Relation
+        fields = ['from_user', 'to_user']
+
+    def create(self, validated_data):
+        relation = Relation.objects.create(**validated_data)
+        return relation

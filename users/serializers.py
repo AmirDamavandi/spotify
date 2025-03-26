@@ -61,3 +61,17 @@ class EditUserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['avatar', 'nickname']
+
+class UserAccountUpdateSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(read_only=True)
+    email = serializers.EmailField(required=False)
+    gender = serializers.CharField(required=False)
+    date_of_birth = serializers.DateField(required=False)
+    country = serializers.CharField(required=False)
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'gender', 'date_of_birth', 'country']
+
+    def create(self, validated_data):
+        user = User.objects.update(**validated_data)
+        return user

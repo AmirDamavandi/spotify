@@ -1,7 +1,10 @@
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView, Response
-from .serializers import AuthenticatedUserProfileSerializer, UserProfileSerializer, UserSignUpSerializer, EditUserProfileSerializer
+from .serializers import (AuthenticatedUserProfileSerializer, UserProfileSerializer, UserSignUpSerializer,
+                          EditUserProfileSerializer, UserAccountUpdateSerializer
+                          )
 from .models import User
 from .permissions import IsNotAuthenticated, IsOwner
 
@@ -64,3 +67,31 @@ class UserSignUpAPIView(APIView):
             success_message = {'message': 'User created successfully.'}
             return Response(success_message, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserAccountUpdateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        user = self.request.user
+        return user
+
+    def get_serializer_class(self):
+        return UserAccountUpdateSerializer
+
+    def get(self, request, *args, **kwargs):
+        user = self.get_object()
+        serializer = self.get_serializer_class()
+        data = serializer(user).data
+        return Response(data, status=status.HTTP_200_OK)
+
+    def put(self, request, *args, **kwargs):
+        user = self.get_object()
+        data = request.data
+        serializer = self.get_serializer_class()
+        user_data = serializer(data=data, instance=user)
+        if user_data.is_valid():
+            user_data.save()
+            success_message = {'message': 'Profile Saved'}
+            return Response(success_message, status=status.HTTP_200_OK)
+        return Response(user_data.errors, status=status.HTTP_400_BAD_REQUEST)

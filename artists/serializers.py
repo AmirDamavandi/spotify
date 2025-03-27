@@ -20,7 +20,7 @@ class ArtistMiniSerializer(serializers.ModelSerializer):
         exclude = ['id']
 
 class ArtistSerializer(serializers.ModelSerializer):
-    user = ArtistUserSerializer(read_only=True)
+    user = ArtistUserSerializer()
 
     class Meta:
         model = Artist
@@ -34,3 +34,12 @@ class ArtistSerializer(serializers.ModelSerializer):
         representation['popular_songs'] = SongSerializer(artist_popular_songs(instance, 5), many=True).data
         representation['albums'] = AlbumMiniSerializer(artist_albums(instance), many=True).data
         return representation
+
+class ArtistRegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Artist
+        fields = ['user']
+
+    def create(self, validated_data):
+        artist = Artist.objects.create(**validated_data)
+        return artist

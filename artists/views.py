@@ -1,9 +1,11 @@
 from django.http import Http404
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from artists.models import Artist
-from artists.serializers import ArtistSerializer
+from artists.serializers import ArtistSerializer, ArtistRegisterSerializer
 from users.models import Relation
+from rest_framework.permissions import IsAuthenticated
 
 
 # Create your views here.
@@ -28,3 +30,17 @@ class ArtistAPIView(APIView):
         data = artist_serializer.data
         data['is_following'] = is_following
         return Response(data)
+
+class ArtistRegisterAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = {'user': request.user.id}
+        serializer = ArtistRegisterSerializer(data=data)
+        print(data)
+        if serializer.is_valid():
+            serializer.save()
+            success_message = {'message': 'Artist Registered'}
+            return Response(success_message, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

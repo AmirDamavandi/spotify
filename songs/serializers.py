@@ -1,6 +1,7 @@
-from django.db.models import DateField
 from rest_framework import serializers
+from artists.models import Artist
 from artists.serializers import ArtistMiniSerializer
+from users.models import User
 from .models import Album, Song, Playlist, PlaylistSongs
 from .services import song_stream_count, album_song_count, album_duration, playlist_song_count, playlist_duration
 
@@ -84,3 +85,16 @@ class PlaylistSerializer(serializers.ModelSerializer):
         representation['song_count'] = playlist_song_count(instance)
         representation['playlist_duration'] = playlist_duration(instance)
         return representation
+
+# class AlbumArtistsSerializer(serializers.ModelSerializer):
+#     user = serializers.UUIDField(source='user.id')
+#     class Meta:
+#         model = Artist
+#         fields = ['user']
+
+
+class AlbumCreateSerializer(serializers.ModelSerializer):
+    artist_s = serializers.PrimaryKeyRelatedField(many=True, queryset=Artist.objects.all())
+    class Meta:
+        model = Album
+        exclude = ['is_deleted']

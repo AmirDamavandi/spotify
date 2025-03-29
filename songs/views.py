@@ -1,13 +1,13 @@
 from django.http import Http404
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from artists.models import Artist
 from songs.models import Album, Playlist, PlaylistSongs
-from songs.serializers import AlbumSerializer, PlaylistSerializer, AlbumCreateSerializer, SongUploadSerializer
+from songs.serializers import AlbumSerializer, PlaylistSerializer, AlbumCreateSerializer, SongUploadSerializer, \
+    PlaylistCreateSerializer
 from .permissions import IsPrivatePlaylistCreator, IsArtist
-import json
 # Create your views here.
 
 
@@ -65,3 +65,19 @@ class SongUploadAPIView(APIView):
             success_message = {'message': 'Song uploaded'}
             return Response(success_message, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PlaylistCreateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        creator = request.user.id
+        data['creator'] = creator
+        serializer = PlaylistCreateSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            success_message = {'message': 'Playlist created'}
+            return Response(success_message, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

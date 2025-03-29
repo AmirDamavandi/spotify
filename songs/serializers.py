@@ -103,3 +103,10 @@ class SongUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Song
         fields = ['name', 'cover', 'artist_s', 'album', 'song', 'duration', 'credits']
+
+
+class PlaylistCreateSerializer(serializers.ModelSerializer):
+    creator = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
+    class Meta:
+        model = Playlist
+        fields = ['creator', 'name', 'cover']

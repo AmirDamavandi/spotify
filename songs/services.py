@@ -23,6 +23,8 @@ def album_song_count(album: Album):
     return album.songs.count()
 
 def album_duration(album: Album):
+    if not album.songs.exists():
+        return None
     duration = album.songs.aggregate(
         album_duration=Sum('duration')
     )
@@ -34,6 +36,8 @@ def playlist_song_count(playlist: Playlist):
     return count
 
 def playlist_duration(playlist: Playlist):
+    if not playlist.songs.exists():
+        return None
     duration = playlist.songs.aggregate(
         playlist_duration=Sum('duration')
     )

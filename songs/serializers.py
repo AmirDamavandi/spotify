@@ -98,3 +98,8 @@ class AlbumCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Album
         exclude = ['is_deleted']
+
+class SongUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Song
+        fields = ['name', 'cover', 'artist_s', 'album', 'song', 'duration', 'credits']

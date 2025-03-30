@@ -39,3 +39,9 @@ class IsArtist(BasePermission):
         if not request.user.is_authenticated or not is_user_a_artist(request.user):
             raise IsArtistAPIException(detail='You are unauthorized to perform this action', code='unauthorized')
         return True
+
+class IsOwnerOrCollaborator(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.user == obj.creator or request.user in obj.collaborators.all():
+            return True
+        return False

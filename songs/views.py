@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from songs.models import Album, Playlist, PlaylistSongs
 from songs.serializers import AlbumSerializer, PlaylistSerializer, AlbumCreateSerializer, SongUploadSerializer, \
-    PlaylistCreateSerializer
-from .permissions import IsPrivatePlaylistCreator, IsArtist
+    PlaylistCreateSerializer, AddSongToPlaylistSerializer
+from .permissions import IsPrivatePlaylistCreator, IsArtist, IsOwnerOrCollaborator
 # Create your views here.
 
 
@@ -81,3 +81,20 @@ class PlaylistCreateAPIView(APIView):
             return Response(success_message, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class AddSongToPlaylistAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsOwnerOrCollaborator]
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        try:
+            playlist = Playlist.objects.get(id=data.get('playlist', None))
+            self.check_object_permissions(self.request, playlist)
+        except Playlist.DoesNotExist:
+            pass
+        serializer = AddSongToPlaylistSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            success_message = {'message': 'Song added to playlist'}
+            return Response(success_message, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

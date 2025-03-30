@@ -110,3 +110,14 @@ class PlaylistCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Playlist
         fields = ['creator', 'name', 'cover']
+
+class AddSongToPlaylistSerializer(serializers.ModelSerializer):
+    song = serializers.PrimaryKeyRelatedField(queryset=Song.objects.all())
+    playlist = serializers.PrimaryKeyRelatedField(queryset=Playlist.objects.all())
+    class Meta:
+        model = PlaylistSongs
+        fields = ['song', 'playlist']
+
+    def create(self, validated_data):
+        instance = PlaylistSongs.objects.create(**validated_data)
+        return instance

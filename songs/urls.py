@@ -1,6 +1,7 @@
 from django.urls import path
 from core import views as core_views
-from .views import AlbumAPIView, PlaylistAPIView, AlbumCreateAPIView, SongUploadAPIView, PlaylistCreateAPIView
+from .views import AlbumAPIView, PlaylistAPIView, AlbumCreateAPIView, SongUploadAPIView, PlaylistCreateAPIView, \
+    AddSongToPlaylistAPIView
 
 app_name = 'songs'
 
@@ -11,4 +12,5 @@ urlpatterns = [
     path(r'album/create/', AlbumCreateAPIView.as_view(), name='AlbumCreateAPIView'),
     path(r'song/upload/', SongUploadAPIView.as_view(), name='SongUploadAPIView'),
     path(r'playlist/create/', PlaylistCreateAPIView.as_view(), name='PlaylistCreateAPIView'),
+    path(r'song/add/to/playlist/', AddSongToPlaylistAPIView.as_view(), name='AddSongToPlaylistAPIView'),
 ]

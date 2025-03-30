@@ -37,7 +37,6 @@ class ArtistRegisterAPIView(APIView):
     def post(self, request):
         data = {'user': request.user.id}
         serializer = ArtistRegisterSerializer(data=data)
-        print(data)
         if serializer.is_valid():
             serializer.save()
             success_message = {'message': 'Artist Registered'}

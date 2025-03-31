@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Playlist, Album, Song, PlaylistSongs, PlaylistCollaborators, LikedPlaylist, UserLikedSongs
+from .models import Playlist, Album, Song, PlaylistSongs, PlaylistCollaborators, LikedPlaylist, UserLikedSongs, \
+    PlaylistCollaboratorToken
 
 
 # Register your models here.
@@ -47,3 +48,11 @@ class UserLikedSongsAdmin(admin.ModelAdmin):
     list_display = [
         'like_playlist', 'song', 'added_at'
     ]
+
+@admin.register(PlaylistCollaboratorToken)
+class ModelNameAdmin(admin.ModelAdmin):
+    list_display = ['playlist', 'token', 'created_at', 'expires_at']
+    fieldsets = (
+        ('Playlist', {'fields': ['playlist']}),
+        ('Expires', {'fields': ['expires_at']}),
+    )

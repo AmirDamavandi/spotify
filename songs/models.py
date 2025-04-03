@@ -4,8 +4,7 @@ from django.db import models
 from django.db.models import CASCADE
 from django.core.validators import FileExtensionValidator
 from django.utils.translation import gettext_lazy as _
-from datetime import timedelta
-from .utils import generate_playlist_collaborator_token
+from .utils import generate_playlist_collaborator_token, five_minutes
 
 # Create your models here.
 
@@ -141,7 +140,7 @@ class PlaylistCollaboratorToken(models.Model):
     playlist = models.ForeignKey('Playlist', on_delete=CASCADE, related_name='playlist_collaborator_tokens')
     token = models.CharField(default=generate_playlist_collaborator_token, max_length=50, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField(default=timezone.now() + timedelta(minutes=5))
+    expires_at = models.DateTimeField(default=five_minutes)
 
     def __str__(self):
         return f'{self.token}'

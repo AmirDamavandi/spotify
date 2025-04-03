@@ -1,7 +1,8 @@
 from rest_framework.permissions import BasePermission
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, PermissionDenied
 from rest_framework import status
 from artists.models import Artist
+from .models import PlaylistCollaborators, PlaylistCollaboratorToken, Playlist
 
 class GenericAPIException(APIException):
     status_code = status.HTTP_404_NOT_FOUND
@@ -18,7 +19,20 @@ class IsPrivatePlaylistCreator(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if obj.playlist_type == 'private':
-            if not obj.creator == request.user:
+            if request.query_params.get('collab-token', None):
+                if not request.user.is_authenticated:
+                    message = {'message': 'Unauthenticated request'}
+                    return PermissionDenied(message)
+                param_token = request.query_params.get('collab-token', None)
+                try:
+                    token = PlaylistCollaboratorToken.objects.get(token=param_token, playlist=obj)
+                    collab_in_playlist = PlaylistCollaborators.objects.filter(playlist=obj, collaborator=request.user)
+                    if token.is_valid() and not collab_in_playlist.exists() and not request.user == obj.creator:
+                        PlaylistCollaborators.objects.create(playlist=obj, collaborator=request.user)
+                        return True
+                except PlaylistCollaboratorToken.DoesNotExist:
+                    pass
+            if not request.user == obj.creator and not request.user in obj.collaborators.all():
                 raise GenericAPIException(detail='Page Not Found', code='not_found')
         return True
 
@@ -45,3 +59,9 @@ class IsOwnerOrCollaborator(BasePermission):
         if request.user == obj.creator or request.user in obj.collaborators.all():
             return True
         return False
+
+class IsPlaylistOwner(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if not request.user == obj.creator:
+            return False
+        return True

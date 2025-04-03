@@ -2,7 +2,7 @@ from rest_framework import serializers
 from artists.models import Artist
 from artists.serializers import ArtistMiniSerializer
 from users.models import User
-from .models import Album, Song, Playlist, PlaylistSongs
+from .models import Album, Song, Playlist, PlaylistSongs, PlaylistCollaboratorToken
 from .services import song_stream_count, album_song_count, album_duration, playlist_song_count, playlist_duration
 
 
@@ -120,4 +120,13 @@ class AddSongToPlaylistSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         instance = PlaylistSongs.objects.create(**validated_data)
+        return instance
+
+class PlaylistCollaboratorTokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlaylistCollaboratorToken
+        fields = ['playlist', 'token']
+
+    def create(self, validated_data):
+        instance = PlaylistCollaboratorToken.objects.create(**validated_data)
         return instance

@@ -65,3 +65,10 @@ class IsPlaylistOwner(BasePermission):
         if not request.user == obj.creator:
             return False
         return True
+
+class IsPrivatePlaylistOwner(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if obj.playlist_type == 'private':
+            if not request.user == obj.creator:
+                raise GenericAPIException(detail='Page Not Found', code='not_found')
+        return True

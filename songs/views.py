@@ -8,9 +8,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from songs.models import Album, Playlist, PlaylistSongs, PlaylistCollaboratorToken, PlaylistCollaborators
 from songs.serializers import AlbumSerializer, PlaylistSerializer, AlbumCreateSerializer, SongUploadSerializer, \
-    PlaylistCreateSerializer, AddSongToPlaylistSerializer, PlaylistCollaboratorTokenSerializer
+    PlaylistCreateSerializer, AddSongToPlaylistSerializer, PlaylistCollaboratorTokenSerializer, PlaylistEditSerializer
 from .permissions import IsPlaylistOwner
-from .permissions import IsPrivatePlaylistCreator, IsArtist, IsOwnerOrCollaborator
+from .permissions import IsPrivatePlaylistCreator, IsArtist, IsOwnerOrCollaborator, IsPrivatePlaylistOwner
 # Create your views here.
 
 
@@ -55,6 +55,20 @@ class PlaylistAPIView(APIView):
         serializer = PlaylistSerializer(playlist)
         data = serializer.data
         return Response(data, status=status.HTTP_200_OK)
+
+    def put(self, request, id):
+        self.permission_classes = [IsPrivatePlaylistOwner, IsPlaylistOwner]
+        playlist = self.get_object()
+        self.check_object_permissions(self.request, playlist)
+        data = request.data
+        serializer_class = PlaylistEditSerializer
+        serializer = serializer_class(data=data, instance=self.get_object())
+        if serializer.is_valid():
+            serializer.save()
+            success_message = {'message': 'Playlist updated'}
+            return Response(success_message, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class AlbumCreateAPIView(APIView):
     permission_classes = [IsArtist]

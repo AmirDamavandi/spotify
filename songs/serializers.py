@@ -130,3 +130,14 @@ class PlaylistCollaboratorTokenSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         instance = PlaylistCollaboratorToken.objects.create(**validated_data)
         return instance
+
+class PlaylistEditSerializer(serializers.ModelSerializer):
+    cover = serializers.ImageField(required=False)
+    name = serializers.CharField(required=False)
+    class Meta:
+        model = Playlist
+        fields = ['cover', 'name', 'description']
+
+    def create(self, validated_data):
+        playlist = Playlist.objects.update(**validated_data)
+        return playlist

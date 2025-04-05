@@ -1,7 +1,8 @@
-from django.db.models import DateField
 from rest_framework import serializers
+from artists.models import Artist
 from artists.serializers import ArtistMiniSerializer
-from .models import Album, Song, Playlist, PlaylistSongs
+from users.models import User
+from .models import Album, Song, Playlist, PlaylistSongs, PlaylistCollaboratorToken
 from .services import song_stream_count, album_song_count, album_duration, playlist_song_count, playlist_duration
 
 
@@ -84,3 +85,59 @@ class PlaylistSerializer(serializers.ModelSerializer):
         representation['song_count'] = playlist_song_count(instance)
         representation['playlist_duration'] = playlist_duration(instance)
         return representation
+
+# class AlbumArtistsSerializer(serializers.ModelSerializer):
+#     user = serializers.UUIDField(source='user.id')
+#     class Meta:
+#         model = Artist
+#         fields = ['user']
+
+
+class AlbumCreateSerializer(serializers.ModelSerializer):
+    artist_s = serializers.PrimaryKeyRelatedField(many=True, queryset=Artist.objects.all())
+    class Meta:
+        model = Album
+        exclude = ['is_deleted']
+
+class SongUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Song
+        fields = ['name', 'cover', 'artist_s', 'album', 'song', 'duration', 'credits']
+
+
+class PlaylistCreateSerializer(serializers.ModelSerializer):
+    creator = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
+    class Meta:
+        model = Playlist
+        fields = ['creator', 'name', 'cover']
+
+class AddSongToPlaylistSerializer(serializers.ModelSerializer):
+    song = serializers.PrimaryKeyRelatedField(queryset=Song.objects.all())
+    playlist = serializers.PrimaryKeyRelatedField(queryset=Playlist.objects.all())
+    class Meta:
+        model = PlaylistSongs
+        fields = ['song', 'playlist']
+
+    def create(self, validated_data):
+        instance = PlaylistSongs.objects.create(**validated_data)
+        return instance
+
+class PlaylistCollaboratorTokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlaylistCollaboratorToken
+        fields = ['playlist', 'token']
+
+    def create(self, validated_data):
+        instance = PlaylistCollaboratorToken.objects.create(**validated_data)
+        return instance
+
+class PlaylistEditSerializer(serializers.ModelSerializer):
+    cover = serializers.ImageField(required=False)
+    name = serializers.CharField(required=False)
+    class Meta:
+        model = Playlist
+        fields = ['cover', 'name', 'description']
+
+    def create(self, validated_data):
+        playlist = Playlist.objects.update(**validated_data)
+        return playlist

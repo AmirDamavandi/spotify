@@ -6,4 +6,4 @@ from artists.models import Artist
 
 @admin.register(Artist)
 class ArtistAdmin(admin.ModelAdmin):
-    list_display = ['user']
+    list_display = ['id', 'user']

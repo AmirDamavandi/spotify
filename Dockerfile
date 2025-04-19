@@ -1,13 +1,13 @@
-FROM python:3.12
+FROM python:latest
 
-WORKDIR ./project/
+WORKDIR /project
 
-COPY requirements.txt ./project/
+COPY requirements.txt /project/
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-COPY . ./project/
+COPY . /project/
 RUN python manage.py migrate
 RUN python manage.py collectstatic --noinput
 

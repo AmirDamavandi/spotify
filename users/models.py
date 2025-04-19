@@ -25,7 +25,7 @@ class User(AbstractBaseUser):
     deleted_at = models.DateTimeField(blank=True, null=True, editable=False)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['nickname']
+    REQUIRED_FIELDS = ['nickname', 'gender']
 
     objects = UserManager()
 

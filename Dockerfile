@@ -1,13 +1,13 @@
 FROM python:latest
 
-WORKDIR /project
+WORKDIR /spotify_project
 
-COPY requirements.txt /project/
+COPY requirements.txt /spotify_project/
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-COPY . /project/
+COPY . /spotify_project/
 RUN python manage.py migrate
 RUN python manage.py collectstatic --noinput
 
